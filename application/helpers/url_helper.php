@@ -6,7 +6,7 @@
  *
  * This content is released under the MIT License (MIT)
  *
- * Copyright (c) 2014 - 2017, British Columbia Institute of Technology
+ * Copyright (c) 2014 - 2015, British Columbia Institute of Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,10 +28,10 @@
  *
  * @package	CodeIgniter
  * @author	EllisLab Dev Team
- * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
- * @copyright	Copyright (c) 2014 - 2017, British Columbia Institute of Technology (http://bcit.ca/)
+ * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (http://ellislab.com/)
+ * @copyright	Copyright (c) 2014 - 2015, British Columbia Institute of Technology (http://bcit.ca/)
  * @license	http://opensource.org/licenses/MIT	MIT License
- * @link	https://codeigniter.com
+ * @link	http://codeigniter.com
  * @since	Version 1.0.0
  * @filesource
  */
@@ -44,7 +44,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @subpackage	Helpers
  * @category	Helpers
  * @author		EllisLab Dev Team
- * @link		https://codeigniter.com/user_guide/helpers/url_helper.html
+ * @link		http://codeigniter.com/user_guide/helpers/url_helper.html
  */
 
 // ------------------------------------------------------------------------
@@ -161,13 +161,24 @@ if ( ! function_exists('anchor'))
 
 		$site_url = is_array($uri)
 			? site_url($uri)
-			: (preg_match('#^(\w+:)?//#i', $uri) ? $uri : site_url($uri));
-
+			: preg_match('#^(\w+:)?//#i', $uri) ? $uri : site_url($uri);
+			
+		//If title parameter is blank, check to see if the uri parameter has http or www in it.  If it doesn't, just put a space as the title. #ADSI
 		if ($title === '')
 		{
-			$title = $site_url;
+			if(strpos($uri,'http://')!==false or strpos($uri,'www.')!==false){
+				$title = $site_url;
+			}else{
+				$title='&nbsp;';
+			}
 		}
-
+		
+		//If uri parameter's first character is a '#', set site_url variable to the uri. #ADSI
+		if(substr($uri,0,1)=='#'){
+			$site_url=$uri;
+		}
+		
+		
 		if ($attributes !== '')
 		{
 			$attributes = _stringify_attributes($attributes);
@@ -474,7 +485,7 @@ if ( ! function_exists('url_title'))
 	 * @param	string	$str		Input string
 	 * @param	string	$separator	Word separator
 	 *			(usually '-' or '_')
-	 * @param	bool	$lowercase	Whether to transform the output string to lowercase
+	 * @param	bool	$lowercase	Wether to transform the output string to lowercase
 	 * @return	string
 	 */
 	function url_title($str, $separator = '-', $lowercase = FALSE)
@@ -492,7 +503,7 @@ if ( ! function_exists('url_title'))
 
 		$trans = array(
 			'&.+?;'			=> '',
-			'[^\w\d _-]'		=> '',
+			'[^a-z0-9 _-]'		=> '',
 			'\s+'			=> $separator,
 			'('.$q_separator.')+'	=> $separator
 		);
@@ -500,7 +511,7 @@ if ( ! function_exists('url_title'))
 		$str = strip_tags($str);
 		foreach ($trans as $key => $val)
 		{
-			$str = preg_replace('#'.$key.'#i'.(UTF8_ENABLED ? 'u' : ''), $val, $str);
+			$str = preg_replace('#'.$key.'#i', $val, $str);
 		}
 
 		if ($lowercase === TRUE)
