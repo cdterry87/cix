@@ -12,7 +12,7 @@ class CIX_Model extends CI_Model {
 	 * @param string $table - The table the data will be inserted into (for comparison).
 	 * -------------------------------------------------------------------------------- */
 	public function prepare($table){
-		$prepared='';
+		$prepared=array();
 		
 		//Set post data.
 		$data=$this->input->post();
